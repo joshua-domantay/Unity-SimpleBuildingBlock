@@ -6,11 +6,13 @@ TagManager:
   tags:
   - Base
   - MyCube
+  - MySphere
+  - MyCapsule
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Clickable
   - Water
   - UI
   - 
