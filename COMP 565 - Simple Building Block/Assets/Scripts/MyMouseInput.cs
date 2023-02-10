@@ -5,8 +5,6 @@ using UnityEngine.EventSystems;
  
 public class MyMouseInput : MonoBehaviour
 {
-    int index = 0;
-    int clickableLayerMask = 1 << 3;
  
     // Start is called before the first frame update
     void Start()
@@ -17,7 +15,7 @@ public class MyMouseInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
- 
+        /*
         if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())  // check if left button is pressed AND mouse is not over UI
         {
             // take mouse position, convert from screen space to world space, do a raycast, store output of raycast into 
@@ -26,20 +24,18 @@ public class MyMouseInput : MonoBehaviour
             #region Screen To World
             RaycastHit hitInfo = new RaycastHit();
             // Add layer mask to prevent clicking of explosion particles
-            bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, Mathf.Infinity, clickableLayerMask);
-            if (hit)
+            bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, Mathf.Infinity, GameController.ClickableLayerMask);
+            if (hit && !GameController.Instance.PreviewObj.InCollision)
             {
                 
-                /*
-                #region HIDE
-                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.tag = "MyCube";
-                cube.layer = LayerMask.NameToLayer("Clickable");
-                cube.GetComponent<BoxCollider>().isTrigger = true;
-                //cube.GetComponent<Renderer>().material = blockMaterial;
-                cube.AddComponent<TriangleExplosion>();     // Add explosion script to cube
-                #endregion
-                */
+                // #region HIDE
+                // var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                // cube.tag = "MyCube";
+                // cube.layer = LayerMask.NameToLayer("Clickable");
+                // cube.GetComponent<BoxCollider>().isTrigger = true;
+                // //cube.GetComponent<Renderer>().material = blockMaterial;
+                // cube.AddComponent<TriangleExplosion>();     // Add explosion script to cube
+                // #endregion
                 GameObject newObject = GameController.Instance.GetObject();
  
                 //cube.transform.position = new Vector3(hitInfo.point.x, hitInfo.point.y + 0.5f, hitInfo.point.z);
@@ -95,12 +91,21 @@ public class MyMouseInput : MonoBehaviour
             }
             #endregion
         }
+        */
+
+        // IF left click, THEN create object using PreviewObject's position
+        if(Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
+            if(!GameController.Instance.PreviewObj.InCollision) {
+                GameObject newObject = GameController.Instance.GetObject();
+                newObject.transform.position = GameController.Instance.PreviewObj.transform.position;
+            }
+        }
 
         // IF right click and mouse is not over UI, THEN explosion script
         if(Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject()) {
             RaycastHit hitInfo = new RaycastHit();
             // Add layer mask to prevent clicking of explosion particles
-            bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, Mathf.Infinity, clickableLayerMask);
+            bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, Mathf.Infinity, GameController.ClickableLayerMask);
             if(hit) {
                 if(hitInfo.transform.CompareTag("MyCube") || hitInfo.transform.CompareTag("MySphere") || hitInfo.transform.CompareTag("MyCapsule")) {
                     hitInfo.transform.gameObject.GetComponent<TriangleExplosion>().StartCoroutine("SplitMesh", true);

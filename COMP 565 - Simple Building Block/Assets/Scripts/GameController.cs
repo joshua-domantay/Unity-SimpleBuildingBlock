@@ -14,10 +14,13 @@ public enum MaterialType {
 
 public class GameController : MonoBehaviour {
     private static GameController instance;
+    private static int clickableLayerMask = 1 << 3;
 
     private ObjectType objectChoosen = ObjectType.CUBE;
     private MaterialType materialChoosen = MaterialType.STONE;
 
+    [SerializeField] private PreviewObject previewObj;
+    [Header("UI Materials")]
     [SerializeField] private Material stoneMaterial;
     [SerializeField] private Material wallMaterial;
     [SerializeField] private Material woodMaterial;
@@ -33,6 +36,8 @@ public class GameController : MonoBehaviour {
 
     public GameObject GetObject() {
         GameObject obj;
+
+        // Assign object
         switch(objectChoosen) {
             case ObjectType.CUBE:
                 obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -50,6 +55,8 @@ public class GameController : MonoBehaviour {
                 obj.GetComponent<CapsuleCollider>().isTrigger = true;
                 break;
         }
+
+        // Assign material
         switch(materialChoosen) {
             case MaterialType.STONE:
                 obj.GetComponent<Renderer>().material = stoneMaterial;
@@ -66,12 +73,22 @@ public class GameController : MonoBehaviour {
         return obj;
     }
 
-    public void ChangeObject(int x) { objectChoosen = (ObjectType) x; }
+    public void ChangeObject(int x) {
+        objectChoosen = (ObjectType) x;
+
+        // Change preview object mesh and enable/disable appropriate colliders
+        previewObj.ChangeObject(objectChoosen);
+    }
 
     public void ChangeMaterial(int x) { materialChoosen = (MaterialType) x; }
 
     public static GameController Instance { get { return instance; } }
 
+    public static int ClickableLayerMask { get { return clickableLayerMask; } }
+
+    public PreviewObject PreviewObj { get { return previewObj; } }
+
     public ObjectType ObjectChoosen { get { return objectChoosen; } }
+
     public MaterialType MaterialChoosen { get { return materialChoosen; } }
 }
