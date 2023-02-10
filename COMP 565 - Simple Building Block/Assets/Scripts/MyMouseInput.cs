@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
  
 public class MyMouseInput : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class MyMouseInput : MonoBehaviour
     void Update()
     {
  
-        if (Input.GetMouseButtonUp(0))  // check if left button is pressed
+        if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())  // check if left button is pressed AND mouse is not over UI
         {
             // take mouse position, convert from screen space to world space, do a raycast, store output of raycast into 
             // hitInfo object ...
@@ -95,8 +96,8 @@ public class MyMouseInput : MonoBehaviour
             #endregion
         }
 
-        // Right click
-        if(Input.GetMouseButtonDown(1)) {
+        // IF right click and mouse is not over UI, THEN explosion script
+        if(Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject()) {
             RaycastHit hitInfo = new RaycastHit();
             // Add layer mask to prevent clicking of explosion particles
             bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, Mathf.Infinity, clickableLayerMask);
