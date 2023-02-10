@@ -39,7 +39,7 @@ public class MyMouseInput : MonoBehaviour
                 cube.AddComponent<TriangleExplosion>();     // Add explosion script to cube
                 #endregion
                 */
-                GameObject newObject = GameManager.Instance.GetObject();
+                GameObject newObject = GameController.Instance.GetObject();
  
                 //cube.transform.position = new Vector3(hitInfo.point.x, hitInfo.point.y + 0.5f, hitInfo.point.z);
                 #region HIDE
@@ -55,25 +55,28 @@ public class MyMouseInput : MonoBehaviour
                         newObject.transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z + (0.5f));
                     }
                     #region HIDE
-                    if (hitInfo.normal == new Vector3(1, 0, 0)) // x+
+                    else if (hitInfo.normal == new Vector3(1, 0, 0)) // x+
                     {
                         newObject.transform.position = new Vector3(hitInfo.point.x + (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z);
                     }
-                    if (hitInfo.normal == new Vector3(0, 1, 0)) // y+
+                    else if (hitInfo.normal == new Vector3(0, 1, 0)) // y+
                     {
                         newObject.transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (0.5f), hitInfo.transform.position.z);
                     }
-                    if (hitInfo.normal == new Vector3(0, 0, -1)) // z-
+                    else if (hitInfo.normal == new Vector3(0, 0, -1)) // z-
                     {
                         newObject.transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z - (0.5f));
                     }
-                    if (hitInfo.normal == new Vector3(-1, 0, 0)) // x-
+                    else if (hitInfo.normal == new Vector3(-1, 0, 0)) // x-
                     {
                         newObject.transform.position = new Vector3(hitInfo.point.x - (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z);
                     }
-                    if (hitInfo.normal == new Vector3(0, -1, 0)) // y-
+                    else if (hitInfo.normal == new Vector3(0, -1, 0)) // y-
                     {
                         newObject.transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (0.5f), hitInfo.transform.position.z);
+                    }
+                    else {
+                        Destroy(newObject);     // Cannot be placed on object
                     }
                     #endregion
                 }

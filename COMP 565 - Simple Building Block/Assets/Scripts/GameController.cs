@@ -12,8 +12,8 @@ public enum MaterialType {
     WOOD
 }
 
-public class GameManager : MonoBehaviour {
-    private static GameManager instance;
+public class GameController : MonoBehaviour {
+    private static GameController instance;
 
     private ObjectType objectChoosen = ObjectType.CUBE;
     private MaterialType materialChoosen = MaterialType.STONE;
@@ -66,11 +66,11 @@ public class GameManager : MonoBehaviour {
         return obj;
     }
 
-    public void ChangeObject(ObjectType x) { objectChoosen = x; }
+    public void ChangeObject(int x) { objectChoosen = (ObjectType) x; }
 
-    public void ChangeMaterial(MaterialType x) { materialChoosen = x; }
+    public void ChangeMaterial(int x) { materialChoosen = (MaterialType) x; }
 
-    public static GameManager Instance { get { return instance; } }
+    public static GameController Instance { get { return instance; } }
 
     public ObjectType ObjectChoosen { get { return objectChoosen; } }
     public MaterialType MaterialChoosen { get { return materialChoosen; } }
