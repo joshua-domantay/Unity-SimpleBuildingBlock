@@ -7,6 +7,7 @@ public class PreviewObject : MonoBehaviour {
     private SphereCollider sphereCollider;
     private CapsuleCollider capsuleCollider;
     private bool inCollision;
+    private bool canPlace;
 
     [Header("Mesh")]
     [SerializeField] private Mesh cubeMesh;
@@ -56,13 +57,23 @@ public class PreviewObject : MonoBehaviour {
         objRenderer.material = ((inCollision) ? transparentRed : (onBase ? transparentYellow : transparentGreen));
     }
 
+    // Used for when placing objects that adds onto y position
+    public float GetYDiff() {
+        float yDiff = 0.5f;
+        if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) { yDiff += 0.5f; }
+        return yDiff;
+    }
+
+    public bool IsPlaceable() { return (canPlace && !inCollision); }
+
     // Modified version of MyMouseInput early left click
     public void Move(Vector3 mouse) {
+        canPlace = true;
         RaycastHit hitInfo = new RaycastHit();
         bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(mouse), out hitInfo, Mathf.Infinity, (1 << 3));
         if(hit) {
             if(hitInfo.transform.tag.Equals("Base")) {
-                ChangePosition(new Vector3(hitInfo.point.x, hitInfo.point.y + (0.5f), hitInfo.point.z), true);
+                ChangePosition(new Vector3(hitInfo.point.x, hitInfo.point.y + (GetYDiff()), hitInfo.point.z), true);
             } else {
                 if(hitInfo.normal == new Vector3(0, 0, 1)) {    // z+
                     ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z + (0.5f)), false);
@@ -70,9 +81,7 @@ public class PreviewObject : MonoBehaviour {
                     ChangePosition(new Vector3(hitInfo.point.x + (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
                 }
                 else if(hitInfo.normal == new Vector3(0, 1, 0)) {   // y+
-                    float yDiff = 0.5f;
-                    if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) { yDiff += 0.5f; }
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (yDiff), hitInfo.transform.position.z), false);
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (GetYDiff()), hitInfo.transform.position.z), false);
                 }
                 else if(hitInfo.normal == new Vector3(0, 0, -1)) {  // z-
                     ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z - (0.5f)), false);
@@ -81,15 +90,15 @@ public class PreviewObject : MonoBehaviour {
                     ChangePosition(new Vector3(hitInfo.point.x - (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
                 }
                 else if(hitInfo.normal == new Vector3(0, -1, 0)) {  // y-
-                    float yDiff = 0.5f;
-                    if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) { yDiff += 0.5f; }
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (yDiff), hitInfo.transform.position.z), false);
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (GetYDiff()), hitInfo.transform.position.z), false);
                 } else {
                     objRenderer.material = transparentRed;  // Cannot be placed on object
+                    canPlace = false;
                 }
             }
         } else {
             objRenderer.material = transparentRed;
+            canPlace = false;
         }
     }
 
@@ -104,6 +113,4 @@ public class PreviewObject : MonoBehaviour {
             inCollision = false;
         }
     }
-
-    public bool InCollision { get { return inCollision; } }
 }

@@ -92,7 +92,7 @@ public class MyMouseInput : MonoBehaviour {
 
         // IF left click AND mouse not over UI, THEN create object using PreviewObject's position
         if(Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
-            if(!GameController.Instance.PreviewObj.InCollision) {
+            if(GameController.Instance.PreviewObj.IsPlaceable()) {
                 GameObject newObject = GameController.Instance.GetObject();
                 newObject.transform.position = GameController.Instance.PreviewObj.transform.position;
             }
