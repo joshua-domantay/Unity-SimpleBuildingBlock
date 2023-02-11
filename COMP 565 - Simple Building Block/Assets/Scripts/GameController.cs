@@ -47,12 +47,16 @@ public class GameController : MonoBehaviour {
             case ObjectType.SPHERE:
                 obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 obj.tag = "MySphere";
-                obj.GetComponent<SphereCollider>().isTrigger = true;
+                // obj.GetComponent<SphereCollider>().isTrigger = true;
+                obj.GetComponent<SphereCollider>().enabled = false;     // Disable collider and treat it like a box
+                obj.AddComponent<BoxCollider>().isTrigger = true;
                 break;
             default:        // ObjectType.CAPSULE
                 obj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 obj.tag = "MyCapsule";
-                obj.GetComponent<CapsuleCollider>().isTrigger = true;
+                // obj.GetComponent<CapsuleCollider>().isTrigger = true;
+                obj.GetComponent<CapsuleCollider>().enabled = false;        // Disable collider and treat it like a box
+                obj.AddComponent<BoxCollider>().isTrigger = true;
                 break;
         }
 
@@ -70,7 +74,7 @@ public class GameController : MonoBehaviour {
         }
         obj.layer = LayerMask.NameToLayer("Clickable");
         obj.AddComponent<TriangleExplosion>();     // Add explosion script to cube
-        
+
         return obj;
     }
 

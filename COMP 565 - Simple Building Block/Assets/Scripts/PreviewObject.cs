@@ -30,21 +30,21 @@ public class PreviewObject : MonoBehaviour {
         switch(obj) {
             case ObjectType.CUBE:
                 meshFilter.mesh = cubeMesh;
-                boxCollider.enabled = true;
-                sphereCollider.enabled = false;
-                capsuleCollider.enabled = false;
+                // boxCollider.enabled = true;
+                // sphereCollider.enabled = false;
+                // capsuleCollider.enabled = false;
                 break;
             case ObjectType.SPHERE:
                 meshFilter.mesh = sphereMesh;
-                boxCollider.enabled = false;
-                sphereCollider.enabled = true;
-                capsuleCollider.enabled = false;
+                // boxCollider.enabled = false;
+                // sphereCollider.enabled = true;
+                // capsuleCollider.enabled = false;
                 break;
             default:        // ObjectType.CAPSULE
                 meshFilter.mesh = capsuleMesh;
-                boxCollider.enabled = false;
-                sphereCollider.enabled = false;
-                capsuleCollider.enabled = true;
+                // boxCollider.enabled = false;
+                // sphereCollider.enabled = false;
+                // capsuleCollider.enabled = true;
                 break;
         }
     }
@@ -70,7 +70,9 @@ public class PreviewObject : MonoBehaviour {
                     ChangePosition(new Vector3(hitInfo.point.x + (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
                 }
                 else if(hitInfo.normal == new Vector3(0, 1, 0)) {   // y+
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (0.5f), hitInfo.transform.position.z), false);
+                    float yDiff = 0.5f;
+                    if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) { yDiff += 0.5f; }
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (yDiff), hitInfo.transform.position.z), false);
                 }
                 else if(hitInfo.normal == new Vector3(0, 0, -1)) {  // z-
                     ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z - (0.5f)), false);
@@ -79,7 +81,9 @@ public class PreviewObject : MonoBehaviour {
                     ChangePosition(new Vector3(hitInfo.point.x - (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
                 }
                 else if(hitInfo.normal == new Vector3(0, -1, 0)) {  // y-
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (0.5f), hitInfo.transform.position.z), false);
+                    float yDiff = 0.5f;
+                    if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) { yDiff += 0.5f; }
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (yDiff), hitInfo.transform.position.z), false);
                 } else {
                     objRenderer.material = transparentRed;  // Cannot be placed on object
                 }
