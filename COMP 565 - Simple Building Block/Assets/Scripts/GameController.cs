@@ -70,6 +70,7 @@ public class GameController : MonoBehaviour {
         }
         obj.layer = LayerMask.NameToLayer("Clickable");
         obj.AddComponent<TriangleExplosion>();     // Add explosion script to cube
+        
         return obj;
     }
 

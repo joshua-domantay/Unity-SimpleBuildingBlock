@@ -25,49 +25,7 @@ public class PreviewObject : MonoBehaviour {
         capsuleCollider = GetComponent<CapsuleCollider>();
     }
 
-    void Update() {
-        CheckMousePosition();
-    }
-
-    private void CheckMousePosition() {
-        RaycastHit hitInfo = new RaycastHit();
-        bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, Mathf.Infinity, (1 << 3));
-        if(hit) {
-            if(hitInfo.transform.tag.Equals("Base")) {
-                transform.position = new Vector3(hitInfo.point.x, hitInfo.point.y + (0.5f), hitInfo.point.z);
-                objRenderer.material = ((inCollision) ? transparentRed : transparentYellow);
-            } else {
-                if(hitInfo.normal == new Vector3(0, 0, 1)) {    // z+
-                    transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z + (0.5f));
-                    objRenderer.material = ((inCollision) ? transparentRed : transparentGreen);
-                } else if(hitInfo.normal == new Vector3(1, 0, 0)) {     // x+
-                    transform.position = new Vector3(hitInfo.point.x + (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z);
-                    objRenderer.material = ((inCollision) ? transparentRed : transparentGreen);
-                }
-                else if(hitInfo.normal == new Vector3(0, 1, 0)) {   // y+
-                    transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (0.5f), hitInfo.transform.position.z);
-                    objRenderer.material = ((inCollision) ? transparentRed : transparentGreen);
-                }
-                else if(hitInfo.normal == new Vector3(0, 0, -1)) {  // z-
-                    transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z - (0.5f));
-                    objRenderer.material = ((inCollision) ? transparentRed : transparentGreen);
-                }
-                else if(hitInfo.normal == new Vector3(-1, 0, 0)) {  // x-
-                    transform.position = new Vector3(hitInfo.point.x - (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z);
-                    objRenderer.material = ((inCollision) ? transparentRed : transparentGreen);
-                }
-                else if(hitInfo.normal == new Vector3(0, -1, 0)) {  // y-
-                    transform.position = new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (0.5f), hitInfo.transform.position.z);
-                    objRenderer.material = ((inCollision) ? transparentRed : transparentGreen);
-                } else {
-                    objRenderer.material = transparentRed;  // Cannot be placed on object
-                }
-            }
-        } else {
-            objRenderer.material = transparentRed;
-        }
-    }
-
+    // Change mesh and enable/disable appropriate colliders
     public void ChangeObject(ObjectType obj) {
         switch(obj) {
             case ObjectType.CUBE:
@@ -91,25 +49,45 @@ public class PreviewObject : MonoBehaviour {
         }
     }
 
-    /*
-    private void OnCollisionEnter(Collision other) {
-        if(other.gameObject.CompareTag("MyCube") || other.gameObject.CompareTag("MySphere") || other.gameObject.CompareTag("MyCapsule")) {
-            if(snapTo == null) {
-                inCollision = true;
-            } else if(GameObject.ReferenceEquals(snapTo, other.gameObject)) {
-                inCollision = false;
-            }
-        }
-        Debug.Log(inCollision);
+    private void ChangePosition(Vector3 position, bool onBase) {
+        transform.position = position;
+
+        // Collision = red. Placing on base = yellow. Snap on other object = green
+        objRenderer.material = ((inCollision) ? transparentRed : (onBase ? transparentYellow : transparentGreen));
     }
 
-    private void OnCollisionExit(Collision other) {
-        if(other.gameObject.CompareTag("MyCube") || other.gameObject.CompareTag("MySphere") || other.gameObject.CompareTag("MyCapsule")) {
-            inCollision = false;
+    // Modified version of MyMouseInput early left click
+    public void Move(Vector3 mouse) {
+        RaycastHit hitInfo = new RaycastHit();
+        bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(mouse), out hitInfo, Mathf.Infinity, (1 << 3));
+        if(hit) {
+            if(hitInfo.transform.tag.Equals("Base")) {
+                ChangePosition(new Vector3(hitInfo.point.x, hitInfo.point.y + (0.5f), hitInfo.point.z), true);
+            } else {
+                if(hitInfo.normal == new Vector3(0, 0, 1)) {    // z+
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z + (0.5f)), false);
+                } else if(hitInfo.normal == new Vector3(1, 0, 0)) {     // x+
+                    ChangePosition(new Vector3(hitInfo.point.x + (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
+                }
+                else if(hitInfo.normal == new Vector3(0, 1, 0)) {   // y+
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (0.5f), hitInfo.transform.position.z), false);
+                }
+                else if(hitInfo.normal == new Vector3(0, 0, -1)) {  // z-
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z - (0.5f)), false);
+                }
+                else if(hitInfo.normal == new Vector3(-1, 0, 0)) {  // x-
+                    ChangePosition(new Vector3(hitInfo.point.x - (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
+                }
+                else if(hitInfo.normal == new Vector3(0, -1, 0)) {  // y-
+                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (0.5f), hitInfo.transform.position.z), false);
+                } else {
+                    objRenderer.material = transparentRed;  // Cannot be placed on object
+                }
+            }
+        } else {
+            objRenderer.material = transparentRed;
         }
-        Debug.Log(inCollision);
     }
-    */
 
     private void OnTriggerStay(Collider other) {
         if(other.CompareTag("MyCube") || other.CompareTag("MySphere") || other.CompareTag("MyCapsule")) {
@@ -124,6 +102,4 @@ public class PreviewObject : MonoBehaviour {
     }
 
     public bool InCollision { get { return inCollision; } }
-    
-    // public GameObject SnapTo { set { snapTo = value; } }
 }

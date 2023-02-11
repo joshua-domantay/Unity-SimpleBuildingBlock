@@ -3,18 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
  
-public class MyMouseInput : MonoBehaviour
-{
- 
+public class MyMouseInput : MonoBehaviour {
     // Start is called before the first frame update
-    void Start()
-    {
- 
-    }
+    void Start() { }
  
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         /*
         if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())  // check if left button is pressed AND mouse is not over UI
         {
@@ -93,7 +87,10 @@ public class MyMouseInput : MonoBehaviour
         }
         */
 
-        // IF left click, THEN create object using PreviewObject's position
+        // Move PreviewObject
+        GameController.Instance.PreviewObj.Move(Input.mousePosition);
+
+        // IF left click AND mouse not over UI, THEN create object using PreviewObject's position
         if(Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
             if(!GameController.Instance.PreviewObj.InCollision) {
                 GameObject newObject = GameController.Instance.GetObject();
@@ -101,7 +98,7 @@ public class MyMouseInput : MonoBehaviour
             }
         }
 
-        // IF right click and mouse is not over UI, THEN explosion script
+        // IF right click AND mouse is not over UI, THEN run explosion script
         if(Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject()) {
             RaycastHit hitInfo = new RaycastHit();
             // Add layer mask to prevent clicking of explosion particles
