@@ -1,5 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+/*  Joshua Anthony Domantay
+ *  Professor Vahe Karamian
+ *  COMP 565 - 17046
+ *  14 February 2023
+ *  Unity - Mini Project
+ */
+
 using UnityEngine;
 using UnityEngine.EventSystems;
  
