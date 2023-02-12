@@ -50,17 +50,44 @@ public class PreviewObject : MonoBehaviour {
         }
     }
 
-    private void ChangePosition(Vector3 position, bool onBase) {
+    private void ChangePos(Vector3 position, bool onBase) {
         transform.position = position;
 
         // Collision = red. Placing on base = yellow. Snap on other object = green
         objRenderer.material = ((inCollision) ? transparentRed : (onBase ? transparentYellow : transparentGreen));
     }
 
+    private void ChangePosForCapsule(RaycastHit hitInfo, Vector3 position) {
+        if(hitInfo.point.y < hitInfo.transform.position.y) {    // Lower half of capsule
+            position.y -= 0.5f;
+        } else {    // Upper half of capsule
+            position.y += 0.5f;
+        }
+        ChangePos(position, false);
+    }
+
     // Used for when placing objects that adds onto y position
-    public float GetYDiff() {
-        float yDiff = 0.5f;
-        if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) { yDiff += 0.5f; }
+    public float GetYDiff(bool onYAxis, RaycastHit hitInfo) {
+        /*
+        float yDiff = (onYAxis ? 0.5f : 0f);
+        if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) {
+            if(hitInfo.transform.CompareTag("MyCapsule") && onYAxis) {      // Do not add 0.5 when attaching to another capsule on Y axis
+                return yDiff;
+            }
+            yDiff += 0.5f;
+        }
+        return yDiff;
+        */
+        float yDiff = 0f;
+        if(GameController.Instance.ObjectChoosen == ObjectType.CAPSULE) {
+            if(onYAxis) { yDiff = 0.5f; }
+            if(hitInfo.transform.CompareTag("MyCapsule") && onYAxis) {      // Do not add 0.5 when attaching to another capsule on Y axis
+                return yDiff;
+            }
+            yDiff += 0.5f;
+        } else {
+            if(!hitInfo.transform.CompareTag("MyCapsule") && onYAxis) { yDiff = 0.5f; }     // Do not add 0.5 when attaching to capsule on y axis
+        }
         return yDiff;
     }
 
@@ -68,29 +95,123 @@ public class PreviewObject : MonoBehaviour {
 
     // Modified version of MyMouseInput early left click
     public void Move(Vector3 mouse) {
+        /*
         canPlace = true;
         RaycastHit hitInfo = new RaycastHit();
         bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(mouse), out hitInfo, Mathf.Infinity, (1 << 3));
         if(hit) {
             if(hitInfo.transform.tag.Equals("Base")) {
-                ChangePosition(new Vector3(hitInfo.point.x, hitInfo.point.y + (GetYDiff()), hitInfo.point.z), true);
+                ChangePos(new Vector3(hitInfo.point.x, (hitInfo.point.y + GetYDiff(true, hitInfo)), hitInfo.point.z), true);
             } else {
                 if(hitInfo.normal == new Vector3(0, 0, 1)) {    // z+
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z + (0.5f)), false);
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.point.z + (0.5f));
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
                 } else if(hitInfo.normal == new Vector3(1, 0, 0)) {     // x+
-                    ChangePosition(new Vector3(hitInfo.point.x + (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
+                    Vector3 newPos = new Vector3(hitInfo.point.x + (0.5f), (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
                 }
                 else if(hitInfo.normal == new Vector3(0, 1, 0)) {   // y+
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y + (GetYDiff()), hitInfo.transform.position.z), false);
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.point.y + GetYDiff(true, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
                 }
                 else if(hitInfo.normal == new Vector3(0, 0, -1)) {  // z-
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.point.z - (0.5f)), false);
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.point.z - (0.5f));
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
                 }
                 else if(hitInfo.normal == new Vector3(-1, 0, 0)) {  // x-
-                    ChangePosition(new Vector3(hitInfo.point.x - (0.5f), hitInfo.transform.position.y, hitInfo.transform.position.z), false);
+                    Vector3 newPos = new Vector3(hitInfo.point.x - (0.5f), (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
                 }
                 else if(hitInfo.normal == new Vector3(0, -1, 0)) {  // y-
-                    ChangePosition(new Vector3(hitInfo.transform.position.x, hitInfo.point.y - (GetYDiff()), hitInfo.transform.position.z), false);
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.point.y - GetYDiff(true, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
+                } else {
+                    objRenderer.material = transparentRed;  // Cannot be placed on object
+                    canPlace = false;
+                }
+            }
+        } else {
+            objRenderer.material = transparentRed;
+            canPlace = false;
+        }
+        */
+        canPlace = true;
+        RaycastHit hitInfo = new RaycastHit();
+        bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(mouse), out hitInfo, Mathf.Infinity, (1 << 3));
+        if(hit) {
+            if(hitInfo.transform.tag.Equals("Base")) {
+                ChangePos(new Vector3(hitInfo.point.x, (hitInfo.point.y + GetYDiff(true, hitInfo)), hitInfo.point.z), true);
+            } else {
+                if(hitInfo.normal == new Vector3(0, 0, 1)) {    // z+
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.point.z + (0.5f));
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
+                } else if(hitInfo.normal == new Vector3(1, 0, 0)) {     // x+
+                    Vector3 newPos = new Vector3(hitInfo.point.x + (0.5f), (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
+                }
+                else if(hitInfo.normal == new Vector3(0, 1, 0)) {   // y+
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.point.y + GetYDiff(true, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
+                }
+                else if(hitInfo.normal == new Vector3(0, 0, -1)) {  // z-
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.point.z - (0.5f));
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
+                }
+                else if(hitInfo.normal == new Vector3(-1, 0, 0)) {  // x-
+                    Vector3 newPos = new Vector3(hitInfo.point.x - (0.5f), (hitInfo.transform.position.y + GetYDiff(false, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
+                }
+                else if(hitInfo.normal == new Vector3(0, -1, 0)) {  // y-
+                    Vector3 newPos = new Vector3(hitInfo.transform.position.x, (hitInfo.point.y - GetYDiff(true, hitInfo)), hitInfo.transform.position.z);
+                    if(!hitInfo.transform.CompareTag("MyCapsule")) {
+                        ChangePos(newPos, false);
+                    } else {
+                        ChangePosForCapsule(hitInfo, newPos);
+                    }
                 } else {
                     objRenderer.material = transparentRed;  // Cannot be placed on object
                     canPlace = false;
