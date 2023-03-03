@@ -135,6 +135,8 @@ public class PreviewObject : MonoBehaviour {
         }
     }
 
+    public void ResetCollision() { inCollision = false; }
+
     private void OnTriggerStay(Collider other) {
         if(other.CompareTag("MyCube") || other.CompareTag("MySphere") || other.CompareTag("MyCapsule")) {
             inCollision = true;

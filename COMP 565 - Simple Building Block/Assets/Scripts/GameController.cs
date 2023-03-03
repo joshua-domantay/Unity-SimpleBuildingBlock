@@ -65,6 +65,7 @@ public class GameController : MonoBehaviour {
                 Destroy(obj);
             }
         }
+        previewObj.ResetCollision();
     }
 
     public GameObject GetObject() {
