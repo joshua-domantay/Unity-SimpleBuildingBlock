@@ -89,6 +89,7 @@ public class TriangleExplosion : MonoBehaviour
  
     }
  
+    /*
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.tag.Equals("Base"))
@@ -115,6 +116,5 @@ public class TriangleExplosion : MonoBehaviour
     {
         other.transform.GetComponent<Renderer>().material.color = Color.white;
     }
- 
- 
+    */
 }

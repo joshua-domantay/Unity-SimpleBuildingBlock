@@ -41,6 +41,32 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    public void ChangeMaterial(int x) { materialChoosen = (MaterialType) x; }
+
+    public void ChangeObject(int x) {
+        objectChoosen = (ObjectType) x;
+
+        // Change preview object mesh and enable/disable appropriate colliders
+        previewObj.ChangeObject(objectChoosen);
+    }
+
+    public void DestroyObjects(bool explode) {
+        DestroyObjects(explode, "MyCube");
+        DestroyObjects(explode, "MySphere");
+        DestroyObjects(explode, "MyCapsule");
+    }
+
+    public void DestroyObjects(bool explode, string tag) {
+        GameObject[] arr = GameObject.FindGameObjectsWithTag(tag);
+        foreach(GameObject obj in arr) {
+            if(explode) {
+                obj.GetComponent<TriangleExplosion>().StartCoroutine("SplitMesh", true);
+            } else {
+                Destroy(obj);
+            }
+        }
+    }
+
     public GameObject GetObject() {
         GameObject obj;
 
@@ -84,15 +110,6 @@ public class GameController : MonoBehaviour {
 
         return obj;
     }
-
-    public void ChangeObject(int x) {
-        objectChoosen = (ObjectType) x;
-
-        // Change preview object mesh and enable/disable appropriate colliders
-        previewObj.ChangeObject(objectChoosen);
-    }
-
-    public void ChangeMaterial(int x) { materialChoosen = (MaterialType) x; }
 
     public static GameController Instance { get { return instance; } }
 
