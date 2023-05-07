@@ -166,7 +166,7 @@ public class ObjExporter : ScriptableObject {
 
 
 
-    [MenuItem("GameObject/Export OBJ with Material")]
+    //[MenuItem("GameObject/Export OBJ with Material")]
     static void ExportSelectedObject()
     {
         GameObject selectedObject = Selection.activeGameObject;
